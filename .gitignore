@@ -1,0 +1,8 @@
+# Ignorar todos los archivos ocultos
+.*
+
+# Ignorar la carpeta bin y su contenido
+/bin/
+
+# Excepción para no ignorar el propio archivo .gitignore
+!.gitignore
