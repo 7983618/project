@@ -14,8 +14,7 @@ public class Session {
         logged = false;
     }
 	
-	public boolean read_users_file(String user_request, String password_request) {
-		//SI EL COMPO DE CONTRASEÑA ES NULL, BUSCARA SI EXISTE EL USUARIO. SI ES UN STRING, INICIARÁ SESION CON EL USUARIO EXISTENTE (SI CONINCIDEN LAS CLAVES)
+	private boolean read_users_file(String user_request, String password_request) { //SI EL CAMPO DE CONTRASEÑA ES NULL, BUSCARA SI EXISTE EL USUARIO. SI ES UN STRING, BUSCARÁ SI EXISTE UN USUARIO ALMACENADO QUE COINCIDA CON LAS CLAVES; SI EXISTE, ASIGNARÁ SUS VALORES A LOS ATRIBUTOS DE EL USUARIO DE ESTA CLASE.
 		try {
 			File user_file = new File(Config.getUSERS_FILE());
 			Scanner user_reader = new Scanner(user_file);
@@ -24,9 +23,8 @@ public class Session {
 				String[] user_fields = user_line.split(Config.getUSER_REGEX());
 				String username = user_fields[0];
 				String userpasswd = user_fields[1];
-				//ESTE ESTA FALLANDO (NO DEBE DEVOLVER VALOR EN CIERTAS OPCIONES SINO NO SE RECORRE TODOS LOS USUARIOS DE LA TABLA)
-				if (password_request != null) {
-					if (user_request.equals(username) && password_request.equals(userpasswd)) {
+				if (password_request != null) { //SI TIENE CONTRASEÑA
+					if (user_request.equals(username) && password_request.equals(userpasswd)) { //SI COINCIDE CON ALGUN USUARIO ALMACENADO ALMACENAMOS SUS VALORES A LOS ATRIBUTOS DE EL USUARIO DE ESTA CLASE
 						user.setUsername(username);
 						user.setName(user_fields[2]);
 						user.setNif(user_fields[3]);
@@ -45,7 +43,7 @@ public class Session {
 				}
 			}
 			user_reader.close();
-			return false; // LAS CLAVES NO COINCIDEN. O NO EXISTE EL NOMBRE DE USUARIO. O EL FICHERO NO TIENE LINEAS (NUNCA VA A PASAR)
+			return false; // LAS CLAVES NO COINCIDEN CON LAS DE NINGUN USUARIO ALMACENADO. O NO EXISTE UN USUARIO CON EL NOMBRE PROPORCIONADO POR LO QUE SI SE PUEDE CREAR. O EL FICHERO NO TIENE LINEAS (NUNCA VA A PASAR)
 		} catch (FileNotFoundException e) {
 			System.out.println("An error occurred.");
       		e.printStackTrace();
@@ -53,7 +51,7 @@ public class Session {
 		}
 	}
 	
-	public static boolean write_users_file(String user_line) {
+	private static boolean write_users_file(String user_line) { //ESCRIBE EL USUARIO EN EL FICHERO DE USUARIOS
 		try {
 			FileWriter user_writer = new FileWriter(Config.getUSERS_FILE(), true);
 			user_writer.write("\n" + user_line);
@@ -66,61 +64,73 @@ public class Session {
 		}
 	}
 
-	public boolean login(String[] request) { 
+	public boolean login(String[] request) { //VERIFICA SI EL USUARIO Y CONTRASEÑA QUE LE PROPORCIONAN COINCIDEN CON LOS DATOS ALMACENADOS
 		String user_request = request[0];
 		String password_request = request[1];
-		if (read_users_file(user_request, password_request)) {
+		if (read_users_file(user_request, password_request)) { //COMRUEBA
 			logged = true;
-			return true;
+			return true; //COINCIDEN USUARIO Y CONTRASEÑA
 		} else {
-			return false;
+			return false; //NO COINCIDEN O NO EXISTEN
 		}
 	}
 	
-	public static String[] request_login(){
+	public static String[] request_login(){ //PIDE USUARIO Y CONTRASEÑA
 		String[] request = new String[2]; 
 		request[0] = field_formater("Username").toLowerCase();
 		request[1] = field_formater("Password");
 		return request;
 	}
 
-	public boolean signup() {
-		String[] request = request_signup();
+	public boolean signup() { //CREA UN USUARIO E INICIA SESIÓN
+		String[] request = request_signup(); //PIDE LA LINEA DE USUARIO FORMATEADA, EL USUARIO, Y LA CONTRASEÑA
 		String[] login_request = new String[2]; 
-		String user_line = request[0];
-		String username = request[1];
-		String passwd = request[2];
-		login_request[0] = username;
-		login_request[1] = passwd;
-		if (write_users_file(user_line)) {
-			if (login(login_request)) {
-				return true;	
+			//ASIGNA A VARIABLES LOCALES
+			String user_line = request[0];
+			String username = request[1];
+			String passwd = request[2];
+			//CONSTRUYE ARRAY PARA LLAMAR AL METODO LOGIN 
+			login_request[0] = username;
+			login_request[1] = passwd;
+
+		if (write_users_file(user_line)) { //ESCRIBE LINEA DE USUARIO EN EL FICHERO
+			if (login(login_request)) { //INTENTA INICIAR SESIÓN
+				return true; //SE HA CREADO EL USUARIO Y SE HA INCIADO SESIÓN EXITOSAMENTE	
 			} else {
-				return false;
+				return false; //NO SE HA PODIDO INICIAR SESIÓN CON EL USUARIO YA CREADO
 			}
-			
 		} else {
-			return false;
+			return false; //NO SE HA PODIDO ESCRIBIR LA LINEA DE USUARIO EN EL FICHERO
 		}
 		
 	}
 
-	public String[] request_signup(){
-		String[] processed = new String[3];
-		String[] request = new String[8]; 
+	private String[] request_signup(){
+		String[] processed = new String[3]; //LINEA DE USUARIO, NOMBRE DE USUARIO Y CONTRASEÑA
+		String[] request = new String[8]; //CAMPOS DE USUARIO 
 		
 		String user_line = "";
-		while (true) {
-			request[0] = field_formater("Username");
-			request[0] = request[0].toLowerCase();
-			if (read_users_file(request[0],null) == false) {
-				break;	
-			} else {
-				System.out.printf("El nombre de usuario %s no está disponible. Por favor, elige uno diferente.\n", request[0]);
+		while (true) { //PIDE USUARIO HASTA QUE SE PROPORCIONE UNO VÁLIDO
+			request[0] = field_formater("Username"); //PIDE USUARIO
+			request[0] = request[0].toLowerCase(); //TRASFORMA A MINUSCULAS
+			if (read_users_file(request[0],null) == false) { //SI USUARIO NO EXISTE
+				break; //CONTINUA PIDIENDO EL RESTO DE DATOS	
+			} else { //SI EXISTE
+				System.out.printf("\nEl nombre de usuario %s no está disponible. Por favor, elige uno diferente.\n", request[0]); //MUESTRA MENSAJE Y LO VUELVE A PEDIR
 			}
 		}
 		//AÑADIR DOBLE CONTRASEÑA
-		request[1] = field_formater("Password");
+		String passwd_again = "";
+		while (true) {
+			request[1] = field_formater("Password");
+			passwd_again = field_formater("Vuelve a introducir la password");
+			if (request[1].equals(passwd_again)) { //COMPRUEBA QUE LAS PASSWORD SEAN IGUALES
+				break; //SON IGUALES
+			} else {
+				System.out.println("\nLas password ingresadas no coinciden.\nVuelva a intentarlo"); //NO SON IGUALES
+				//SE VUELVEN A SOLICITAR
+			}
+		}
 		request[2] = field_formater("Full Name");
 		request[3] = field_formater("Nif");
 		request[4] = field_formater("Email");
@@ -128,49 +138,50 @@ public class Session {
 		request[6] = field_formater("Birthdate");
 		request[7] = field_formater("Rol"); //TAL VEZ SE TENGA QUE QUITAR
 		for (int i = 0; i < request.length; i++) {
-			user_line = user_line + request[i] + Config.getUSER_REGEX();
+			user_line = user_line + request[i] + Config.getUSER_REGEX(); //CONSTRUYE LINEA DE USUARIO
 		}
-		user_line = user_line.substring(0,user_line.length()-1);
+		user_line = user_line.substring(0,user_line.length()-1); //CORTA ÚLTIMO REGEX
 		processed[0] = user_line; //Linea
 		processed[1] = request[0]; //Usuario
 		processed[2] = request[1]; //Contraseña
-		return processed;
+		return processed; //DEVUELVE LINEA DE USUARIO, NOMBRE DE USUARIO Y CONTRASEÑA
 	}
 
-	public static String field_formater(String field) {
+	private static String field_formater(String field) { //DEVUELVE UN CAMPO DE USUARIO FORMATEADO
 		String field_formated;
-		while (true) {
-			boolean repeat = false;
-			System.out.printf("%s...\n", field);
+		while (true) { //PIDE CAMPO HASTA QUE CUMPLA CON EL FORMATO
+			boolean repeat = false; //CONDICIÓN QUE ALMACENA SI CUMPLE EL FORMATO. SI SE TERMINA EN FALSE SIGNIFICA QUE SE HA CUMPLIDO LAS REGLAS DE FORMATO. SI TERMINA EN TRUE, NO LAS CUMPLE, Y POR ENDE SE VUELVE A REPETIR LA PETICIÓN
+			System.out.printf("%s...\n", field); //MENSAJE
 			
-			field_formated = keyboard.nextLine();
+			field_formated = keyboard.nextLine(); //ENTRADA DE DATOS
 			
-			for (char c : field_formated.toCharArray()) {
+			for (char c : field_formated.toCharArray()) { //COMPRUEBA SI CUMPLE EL FORMATO
 				if (c == Config.getUSER_REGEX().charAt(0)) {
 					System.out.printf("El caracter \"%s\" esta prohibido. Por favor pruebe con otra opción\n", Config.getUSER_REGEX());
-					repeat = true;
-					break;
+					repeat = true; //NO CUMPLE EL FORMATO
+					break; //SE VUELVE A PEDIR CAMPO
 				}
 			}
-			if (repeat == false) {
-				break;
+			if (repeat == false) { //SE CUMPLE EL FORMATO
+				break; //SE FINALIZA LA PETICIÓN
 			}
-			
 		}
-		
-		return field_formated;
+		return field_formated; //DEVUELVE CAMPO FORMATEADO
 	}	
 
+	public String showUser() { //MUESTRA LA INFORMACIÓN DEL USUARIO ACTUAL
+		return user.toString();
+	}
+
+	public void logout() { //ELIMINA LOS DATOS DEL USUARIO ACTUAL Y RESTABLECE EL VALOR LOGGED DE LA CLASE
+        user = new User();
+        logged = false;
+	}
+	
 	public User getUser() {
 		return user;
 	}
-	public void setUser(User user) {
-		this.user = user;
-	}
 	public boolean isLogged() {
 		return logged;
-	}
-	public void setLogged(boolean logged) {
-		this.logged = logged;
 	}
 }
