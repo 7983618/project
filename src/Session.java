@@ -36,22 +36,16 @@ public class Session {
 						user.setRole(user_fields[7]);
 						user_reader.close();
 						return true; // LAS CLAVES COINCIDEN CON LAS DE UN USUARIO ALMACENADO
-					} else {
-						user_reader.close();
-						return false; // LAS CLAVES NO COINCIDEN CON NINGUN USUARIO ALMACENADO (Son incorrecta o el usuario no existe) 
 					}
 				} else {
 					if (user_request.equals(username)) {
 						user_reader.close();
 						return true; //EL USUARIO EXISTE Y POR ENDE NO SE PUEDE CREAR UN USUARIO CON ESE NOMBRE
-					} else {
-						user_reader.close();
-						return false; //NO EXISTE UN USUARIO CON ES NOMBRE POR LO QUE SI ES POSIBLE CREARLO
 					}
 				}
 			}
 			user_reader.close();
-			return false; // EL FICHERO NO TIENE LINEAS (NUNCA VA A PASAR)
+			return false; // LAS CLAVES NO COINCIDEN. O NO EXISTE EL NOMBRE DE USUARIO. O EL FICHERO NO TIENE LINEAS (NUNCA VA A PASAR)
 		} catch (FileNotFoundException e) {
 			System.out.println("An error occurred.");
       		e.printStackTrace();
@@ -72,7 +66,7 @@ public class Session {
 		}
 	}
 
-	public boolean login(String[] request) { //CAMBIAR A BOOLEAN
+	public boolean login(String[] request) { 
 		String user_request = request[0];
 		String password_request = request[1];
 		if (read_users_file(user_request, password_request)) {
@@ -146,16 +140,22 @@ public class Session {
 	public static String field_formater(String field) {
 		String field_formated;
 		while (true) {
+			boolean repeat = false;
 			System.out.printf("%s...\n", field);
 			
 			field_formated = keyboard.nextLine();
+			
 			for (char c : field_formated.toCharArray()) {
 				if (c == Config.getUSER_REGEX().charAt(0)) {
 					System.out.printf("El caracter \"%s\" esta prohibido. Por favor pruebe con otra opción\n", Config.getUSER_REGEX());
-					continue;
+					repeat = true;
+					break;
 				}
 			}
-			break;
+			if (repeat == false) {
+				break;
+			}
+			
 		}
 		
 		return field_formated;

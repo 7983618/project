@@ -1,7 +1,7 @@
 public class Config {
 	private static String VERSION = "0.1.0";
 	private static String FILE_PATH = "./assets/files/";
-	private static String USERS_FILE = "./assets/files/users.txt";
+	private static String USERS_FILE = "assets/files/users.txt";
 	private static String WELCOME = "BIENVENIDA #COMPLETAR";
 	private static String GOODBYE = "Hasta la proxima.";
 	private static String UNLOGGED_MENU = 	"------------------\n" +
