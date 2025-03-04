@@ -1,9 +1,11 @@
 public class Config {
+	
+	private Config() {}
 	private static String VERSION = "0.1.0";
 	private static String FILE_PATH = "./assets/files/";
-	private static String USERS_FILE = "assets/files/users.txt";
-	private static String WELCOME = "BIENVENIDO AL PROYECTO LABERITO.\nEste proyecto se encuentra en desarrollo. Actualmente se ha implementado y documentado toda la parte que tenga que ver con iniciar sessión. Es posible que de primeras no funcione la entrada de datos. Si esto ocurre, basta con volver a ejecutar el programa hasta que funcione (sospecho que la razón es que no se termina de cargar el fichero en el programa).";
-	private static String GOODBYE = "Hasta la proxima.";
+	private static String USERS_FILE = FILE_PATH + "users.txt";
+	private static String WELCOME = "BIENVENIDO AL PROYECTO LABERITO.\nEste proyecto se encuentra en desarrollo. Actualmente se ha implementado y documentado toda la parte que tenga que ver con iniciar sessión siguiendo recomendaciones de Sonar. IMPORTANTE EJECUTAR DESDE EL CENTRO DEL PAQUETE, SINO NO ENCONTRARÁ CORRECTAMENTE LA RUTA DE LOS FICHEROS EXTERNOS";
+	private static String GOODBYE = "Hasta la proxima.\n";
 	private static String UNLOGGED_MENU = 	"\n------------------\n" +
 										 	"1 Iniciar Sesión\n" +
 											"2 Registro\n" +

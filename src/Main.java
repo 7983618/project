@@ -1,8 +1,8 @@
-//CADA VEZ QUE SE AHCE UN COMMIT HAY QUE ACTUALIZAR LA DIRECCIÓN DE LOS USUARIOS (por alguna razón)
 import java.util.Scanner;
 public class Main {
     private static Session session = new Session();
     private static Scanner keyboard = new Scanner(System.in);
+    private static String hr = "------------------";
     public static void main(String[] args) {
         System.out.println();
         System.out.print(Config.getWELCOME());
@@ -12,11 +12,11 @@ public class Main {
             System.out.println(Config.getUNLOGGED_MENU());
             System.out.println("Elección...");
             auxUnlogged = scannerInt();
-            System.out.println("------------------");
+            System.out.println(hr);
             
             if (auxUnlogged == 1) { //INTENTA INICIAR SESIÓN CON USUARIO Y CONTRASEÑA
-                if (session.login(Session.request_login())) { //INICIO DE SESIÓN EXITOSO
-                    System.out.println("------------------");
+                if (session.login(Session.requestLogin())) { //INICIO DE SESIÓN EXITOSO
+                    System.out.println(hr);
                     System.out.print("Sesión Iniciada");
                     if (logged()) { //MUESTRA LOGGED MENU Y PERMITE INTERACTUAR CON ÉL
                         break; //FINALIZA EL PROGRAMA SI SE PULSA 0 EN EL LOGGED MENU
@@ -24,12 +24,13 @@ public class Main {
                         continue; //CONTINUA EL PROGRAMA SI SE PUSA 6 EN EL LOGGED MENU
                     }
                 } else { //FRACASO EN INICIO DE SESIÓN
-                    System.out.println("------------------");
+                    System.out.println(hr);
                     System.out.print("El usuario o la contraseña no coinciden");
                     continue;
                 }
             } else if (auxUnlogged == 2) { //INICIA PROCCESO DE REGISTRO
                 if (session.signup()) { //EXITO AL REGISTRAR USUARIO E INICIAR SESIÓN CON ÉL
+                    System.out.println(hr);
                     System.out.println("Usuario creado con éxito");
                     System.out.print("Sesión Iniciada");
                     if (logged()) { //MUESTRA LOGGED MENU Y PERMITE INTERACTUAR CON ÉL
@@ -61,7 +62,7 @@ public class Main {
             System.out.println(Config.getLOGGED_MENU());
             System.out.println("Elección...");
             auxLogged = scannerInt();
-            System.out.println("------------------");
+            System.out.println(hr);
             if (auxLogged >= 1 && auxLogged <= 4) { //OPCIONES DEL 1-4 SIN DESARROLLAR
                 System.out.print("PRÓXIMAMENTE");
                 continue; //REPITE LOGGED MENU
