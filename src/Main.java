@@ -1,8 +1,22 @@
 import java.util.Scanner;
+/**
+ * Clase principal que maneja la interfaz de usuario y el flujo del programa.
+ * 
+ * @author Santiago Quispe
+ * @version 0.1.0
+ */
 public class Main {
+    /** Sessión del programa principal */
     private static Session session = new Session();
+    /** Objeto Scanner utilizado en toda la clase */
     private static Scanner keyboard = new Scanner(System.in);
+    /** String que simula ser una barra horizontal */
     private static String hr = "------------------";
+    /**
+     * Método principal que inicia el programa.
+     * 
+     * @param args Argumentos de línea de comando (no utilizados)
+     */
     public static void main(String[] args) {
         System.out.println();
         System.out.print(Config.getWELCOME());
@@ -49,12 +63,22 @@ public class Main {
         System.out.print(Config.getGOODBYE());
     }
         
-    
+    /**
+     * Lee un entero desde el teclado.
+     * 
+     * @return El entero ingresado por el usuario
+     */
     private static int scannerInt() { //METODO PARA PEDIR DATOS POR TECLADO
         int num = keyboard.nextInt();
         keyboard.nextLine();
         return num;
     }
+
+    /**
+     * Maneja el menú y las opciones para usuarios autenticados.
+     * 
+     * @return true si el usuario elige salir del programa
+     */
     private static boolean logged() { //MUESTRA LOGGED MENU Y PERMITE INTERACTUAR CON ÉL
         int auxLogged = -1;
         boolean exit = false; //DEFINE SI SE QUIERE VOLVER AL UNLOGGED MENU O SI FINALIZA EL PROGRAMA

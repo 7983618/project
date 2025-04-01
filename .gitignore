@@ -6,3 +6,6 @@
 
 # Excepción para no ignorar el propio archivo .gitignore
 !.gitignore
+
+# Ignorar carpeta doc
+/doc/

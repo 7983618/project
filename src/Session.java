@@ -4,16 +4,34 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException; 
 import java.util.Scanner;
+/**
+ * Gestiona la sesión de usuario, incluyendo login, registro y manejo de datos.
+ * 
+ * @author Santiago Quispe
+ * @version 0.1.0
+ */
 public class Session {
+	/** Objeto Usuario de la Sessión */
     private User user;
-    private boolean logged;
+	/** Valor que determina si se ha iniciado sesión o no */
+	private boolean logged;
 	private static Scanner keyboard = new Scanner(System.in);
 	
+	/**
+	 * Constructor por defecto. Inicializa un nuevo usuario y establece logged a false.
+	 */
 	public Session() {
         user = new User();
         logged = false;
     }
 	
+	/**
+	 * Lee el archivo de usuarios y verifica las credenciales coinciden con las almacenadas o si el usuario existe.
+	 * 
+	 * @param userRequest     Nombre de usuario solicitado
+	 * @param passwordRequest Contraseña solicitada (si es null comprobará si el usuario)
+	 * @return true si las credenciales son válidas o el usuario existe
+	 */
 	private boolean readUsersFile(String userRequest, String passwordRequest) { //SI EL CAMPO DE CONTRASEÑA ES NULL, BUSCARA SI EXISTE EL USUARIO. SI ES UN STRING, BUSCARÁ SI EXISTE UN USUARIO ALMACENADO QUE COINCIDA CON LAS CLAVES; SI EXISTE, ASIGNARÁ SUS VALORES A LOS ATRIBUTOS DE EL USUARIO DE ESTA CLASE.
 		try {
 			File userFile = new File(Config.getUSERS_FILE());
@@ -51,6 +69,12 @@ public class Session {
 		}
 	}
 	
+	/**
+	 * Escribe una nueva línea de usuario en el archivo de usuarios.
+	 * 
+	 * @param userLine Línea de usuario a escribir
+	 * @return true si la escritura fue exitosa
+	 */
 	private static boolean writeUsersFile(String userLine) { //ESCRIBE EL USUARIO EN EL FICHERO DE USUARIOS
 		try (FileWriter userWriter = new FileWriter(Config.getUSERS_FILE(), true)){
 			userWriter.write("\n" + userLine);
@@ -62,6 +86,12 @@ public class Session {
 		}
 	}
 
+	/**
+	 * Intenta iniciar sesión con las credenciales proporcionadas.
+	 * 
+	 * @param request Array con nombre de usuario y contraseña
+	 * @return true si el login fue exitoso
+	 */
 	public boolean login(String[] request) { //VERIFICA SI EL USUARIO Y CONTRASEÑA QUE LE PROPORCIONAN COINCIDEN CON LOS DATOS ALMACENADOS
 		String userRequest = request[0];
 		String passwordRequest = request[1];
@@ -73,6 +103,11 @@ public class Session {
 		}
 	}
 	
+	/**
+	 * Solicita al usuario las credenciales para iniciar sesión.
+	 * 
+	 * @return Array con nombre de usuario y contraseña
+	 */
 	public static String[] requestLogin(){ //PIDE USUARIO Y CONTRASEÑA
 		String[] request = new String[2]; 
 		request[0] = fieldFormater("Username").toLowerCase();
@@ -80,6 +115,11 @@ public class Session {
 		return request;
 	}
 
+	/**
+	 * Registra un nuevo usuario e inicia sesión.
+	 * 
+	 * @return true si el registro y login fueron exitosos
+	 */
 	public boolean signup() { //CREA UN USUARIO E INICIA SESIÓN
 		String[] request = requestSignup(); //PIDE LA LINEA DE USUARIO FORMATEADA, EL USUARIO, Y LA CONTRASEÑA
 		String[] loginRequest = new String[2]; 
@@ -103,6 +143,11 @@ public class Session {
 		
 	}
 
+	/**
+	 * Solicita y procesa los datos para el registro de un nuevo usuario.
+	 * 
+	 * @return Array con la línea de usuario, nombre de usuario y contraseña
+	 */
 	private String[] requestSignup(){
 		String[] processed = new String[3]; //LINEA DE USUARIO, NOMBRE DE USUARIO Y CONTRASEÑA
 		String[] request = new String[8]; //CAMPOS DE USUARIO 
@@ -144,6 +189,12 @@ public class Session {
 		return processed; //DEVUELVE LINEA DE USUARIO, NOMBRE DE USUARIO Y CONTRASEÑA
 	}
 
+	/**
+	 * Formatea y valida un campo de entrada de usuario.
+	 * 
+	 * @param field Nombre del campo a solicitar
+	 * @return Valor del campo formateado y validado
+	 */
 	private static String fieldFormater(String field) { //DEVUELVE UN CAMPO DE USUARIO FORMATEADO
 		String fieldFormated;
 		while (true) { //PIDE CAMPO HASTA QUE CUMPLA CON EL FORMATO
@@ -166,18 +217,36 @@ public class Session {
 		return fieldFormated; //DEVUELVE CAMPO FORMATEADO
 	}	
 
+	/**
+	 * Muestra la información del usuario actual.
+	 * 
+	 * @return Representación en cadena del usuario actual
+	 */
 	public String showUser() { //MUESTRA LA INFORMACIÓN DEL USUARIO ACTUAL
 		return user.toString();
 	}
 
+	/**
+	 * Cierra la sesión del usuario actual.
+	 */
 	public void logout() { //ELIMINA LOS DATOS DEL USUARIO ACTUAL Y RESTABLECE EL VALOR LOGGED DE LA CLASE
         user = new User();
         logged = false;
 	}
 	
+	/**
+	 * Obtiene el usuario actual de la sesión.
+	 * 
+	 * @return El objeto User de la sesión actual
+	 */
 	public User getUser() {
 		return user;
 	}
+	/**
+	 * Verifica si hay una sesión activa.
+	 * 
+	 * @return true si hay un usuario con sesión iniciada, false en caso contrario
+	 */
 	public boolean isLogged() {
 		return logged;
 	}
