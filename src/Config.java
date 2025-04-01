@@ -10,9 +10,10 @@ public class Config {
 	/**
 	 *  Versión actual del programa
 	 */
-	private static String VERSION = "0.1.0";
+	private static String VERSION = "0.2.0";
 	/** Ruta de los archivos */
 	private static String FILE_PATH = "./assets/files/";
+	private static String MAZES_PATH = "./assets/mazes/";
 	/** Ruta de el fichero de usuarios */
 	private static String USERS_FILE = FILE_PATH + "users.txt";
 	/** Mensaje de bienvenida */
@@ -35,6 +36,11 @@ public class Config {
 											"6 Cerrar sesión\n" +
 											"0 Salir\n" +
 											"------------------";
+	private static String MAZE_MENU =		"\n------------------\n" +
+											"1 Introducir nombre de laberinto\n" +
+											"2 Listar laberintos disponibles\n" +
+											"0 Salir\n" +
+											"------------------";											
 	/** Separador de campos de usuario en el fichero de usuarios */
 	private static String USER_REGEX = "#";
 	/** @return Versión actual del programa */
@@ -44,6 +50,10 @@ public class Config {
 	/** @return Ruta de los archivos */
 	public static String getFILE_PATH() {
 		return FILE_PATH;
+	}
+	
+	public static String getMAZES_PATH() {
+		return MAZES_PATH;
 	}
 	/** @return Ruta de el fichero de usuarios */
 	public static String getUSERS_FILE() {
@@ -64,6 +74,10 @@ public class Config {
 	/** @return Menú despues de loggear */
 	public static String getLOGGED_MENU() {
 		return LOGGED_MENU;
+	}
+	
+	public static String getMAZE_MENU() {
+		return MAZE_MENU;
 	}
 	/** @return Separador de campos de usuario en el fichero de usuarios */
 	public static String getUSER_REGEX() {

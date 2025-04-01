@@ -12,6 +12,7 @@ public class Main {
     private static Scanner keyboard = new Scanner(System.in);
     /** String que simula ser una barra horizontal */
     private static String hr = "------------------";
+    private static Maze maze = new Maze();
     /**
      * Método principal que inicia el programa.
      * 
@@ -74,6 +75,11 @@ public class Main {
         return num;
     }
 
+    private static String scannerString() { //METODO PARA PEDIR DATOS POR TECLADO
+        String string = keyboard.nextLine();
+        return string;
+    }
+
     /**
      * Maneja el menú y las opciones para usuarios autenticados.
      * 
@@ -87,7 +93,26 @@ public class Main {
             System.out.println("Elección...");
             auxLogged = scannerInt();
             System.out.println(hr);
-            if (auxLogged >= 1 && auxLogged <= 4) { //OPCIONES DEL 1-4 SIN DESARROLLAR
+            if (auxLogged == 1) {
+                int option = -1;
+                while (option != 0) {
+                    System.out.println(Config.getMAZE_MENU());
+                    option = scannerInt();
+                    if (option == 1) {
+                        maze.loadMaze("laberinto12.txt");
+                    } else if (option == 2) {
+                        
+                    } else if (option == 0) {
+                        option = 0;
+                    } else {
+                        System.out.println("\nNo se ha introducido un número valido");
+                    }
+                }
+            } else if (auxLogged == 2) {
+                
+            } else if (auxLogged == 3) {
+                
+            } else if (auxLogged == 4) { //OPCION 4 SIN DESARROLLAR
                 System.out.print("PRÓXIMAMENTE");
                 continue; //REPITE LOGGED MENU
             } else if (auxLogged == 5) { //INFORMACIÓN DEL USUARIO ACTUAL
