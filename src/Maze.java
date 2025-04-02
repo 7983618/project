@@ -10,6 +10,7 @@ public class Maze {
     private int startJ;
     private int endI;
     private int endJ;
+    private static boolean modified;
 
     private static Scanner mazeReader = new Scanner(System.in);
 
@@ -27,28 +28,70 @@ public class Maze {
                     yCounter++; 
                     mazeReader.nextLine();
                 }
-                System.out.println("X: " + xCounter + " Y: " + yCounter);
+                map = new char[yCounter][xCounter];
                 mazeReader.close();
-                return true;
-                /*
+                
                 mazeReader = new Scanner(mazeFile);
-                while (mazeReader.hasNextLine()) {
-                    String line = mazeReader.nextLine();
-                    System.out.println(line);
+                for (int i = 0; i < yCounter; i++) {
+                    map[i] = mazeReader.nextLine().toCharArray(); 
                 }
                 mazeReader.close();
-                */
+                loaded = true;
+                filename = mazeFilename;
+                return true;
             } catch (FileNotFoundException e) {
                 System.out.println("Se ha producido un error");
                 e.printStackTrace();
                 return false;
             }
         } else {
-            System.out.println("No existe");
             return false;
         }
         
     }
+    public String showMap() {
+        if (loaded) {
+            StringBuilder maze = new StringBuilder();
+            for (int i = 0; i < map.length; i++) {
+                if (i == 0) {
+                    maze.append("  ");
+                    for (int j = 0; j < map[0].length; j++) {
+                        maze.append(j + " ");
+                    }
+                    maze.append("\n");
+                }
+                maze.append(i + " ");
+                for (int j = 0; j < map[0].length; j++) {
+                    maze.append(map[i][j]+" ");
+                }
+                maze.append("\n");
+            }
+            return maze.toString();
+        }
+        return "NO SE HA CARGADO UN LABERINTO TODAVÍA";
+    }
+    public boolean setEntranceExit(int xStart, int yStart, int xEnd, int yEnd) {
+        if (modified) {
+            loadMaze(filename);
+        }
+        if (loaded) {
+            startI = yStart;
+            startJ = xStart;
+            endI = yEnd;
+            endJ = xEnd;
+            map[startI][startJ] = 'S';
+            map[endI][endJ] = 'E';
+            modified = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public char[][] getMap() {
+        return map;
+    }
+    
     
     
 }

@@ -36,7 +36,7 @@ public class Config {
 											"6 Cerrar sesión\n" +
 											"0 Salir\n" +
 											"------------------";
-	private static String MAZE_MENU =		"\n------------------\n" +
+	private static String MAZE_MENU =		"------------------\n" +
 											"1 Introducir nombre de laberinto\n" +
 											"2 Listar laberintos disponibles\n" +
 											"0 Salir\n" +
