@@ -21,13 +21,13 @@ public class Config {
 	/** Mesnsaje de despedida */
 	private static String GOODBYE = "Hasta la proxima.\n";
 	/** Menú antes de loggear */
-	private static String UNLOGGED_MENU = 	"\n------------------\n" +
+	private static String UNLOGGED_MENU = 	"\n-----------------------------\n" +
 										 	"1 Iniciar Sesión\n" +
 											"2 Registro\n" +
 											"0 Salir\n" +
-											"------------------";
+											"-----------------------------";
 	/** Menú despues de loggear */
-	private static String LOGGED_MENU = 	"\n------------------\n" +
+	private static String LOGGED_MENU = 	"\n-----------------------------\n" +
 											"1 Cargar laberinto\n" +
 											"2 Ver laberinto actual\n" +
 											"3 Establecer casillas de entrada y salida\n" +
@@ -35,12 +35,12 @@ public class Config {
 											"5 Ver usuario actual\n" +
 											"6 Cerrar sesión\n" +
 											"0 Salir\n" +
-											"------------------";
-	private static String MAZE_MENU =		"------------------\n" +
+											"-----------------------------";
+	private static String MAZE_MENU =		"-----------------------------\n" +
 											"1 Introducir nombre de laberinto\n" +
 											"2 Listar laberintos disponibles\n" +
 											"0 Salir\n" +
-											"------------------";											
+											"-----------------------------";											
 	/** Separador de campos de usuario en el fichero de usuarios */
 	private static String USER_REGEX = "#";
 	/** @return Versión actual del programa */

@@ -12,8 +12,6 @@ public class Maze {
     private int endJ;
     private static boolean modified;
 
-    private static Scanner mazeReader = new Scanner(System.in);
-
     public Maze() {
     }
 
@@ -66,15 +64,15 @@ public class Maze {
                 }
                 maze.append("\n");
             }
-            return maze.toString();
+            return maze.toString().substring(0, maze.toString().length()-1);
         }
         return "NO SE HA CARGADO UN LABERINTO TODAVÍA";
     }
     public boolean setEntranceExit(int xStart, int yStart, int xEnd, int yEnd) {
-        if (modified) {
-            loadMaze(filename);
-        }
         if (loaded) {
+            if (modified) {
+                loadMaze(filename);
+            }
             startI = yStart;
             startJ = xStart;
             endI = yEnd;
@@ -87,11 +85,22 @@ public class Maze {
             return false;
         }
     }
-
-    public char[][] getMap() {
-        return map;
+    
+    public boolean isLoaded() {
+        return loaded;
     }
-    
-    
-    
+
+    public int getXSize() {
+        return map[0].length;
+    }
+    public int getYSize() {
+        return map.length;
+    }
+    public boolean isWall(int x, int y) {
+        if (map[x][y] == '#') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
