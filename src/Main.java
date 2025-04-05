@@ -4,7 +4,7 @@ import java.util.Scanner;
  * Clase principal que maneja la interfaz de usuario y el flujo del programa.
  * 
  * @author Santiago Quispe
- * @version 0.1.0
+ * @version 0.2.0
  */
 public class Main {
     /** Sessión del programa principal */
@@ -122,8 +122,7 @@ public class Main {
                     } else if (option == 2) { //MUESTRA LA LISTA DE LABERINTOS DISPONIBLES Y PERMITE AL USUARIO ELEGIR ALGUNO
                         mazesList = mazesList(); //OBTIENE LA LISTA DE LABERINTOS
                         int optionMazesList = -1;
-                        while (optionMazesList != 0) {
-                            //MENU CON LOS LABERINTOS DISPONIBLES
+                        while (optionMazesList != 0) { //MENU CON LOS LABERINTOS DISPONIBLES
                             System.out.println("Seleccione alguno de los laberintos disponibles");
                             System.out.println(hr);
                             for (int i = 0; i < mazesList.length; i++) {
@@ -190,7 +189,7 @@ public class Main {
                             correctFormat = true;
                             maze.setEntranceExit(xStart, yStart, xEnd, yEnd);
                         }
-                        System.out.print(hr);
+                        System.out.println(hr);
                     }
                 } else {
                     System.out.println("\nNO SE HA CARGADO UN LABERINTO TODAVÍA");
@@ -203,6 +202,7 @@ public class Main {
                 System.out.print(session.showUser());
                 continue; //REPITE LOGGED MENU
             } else if (auxLogged == 6) { //CERRAR SESIÓN Y VOLVER AL UNLOGGED MENU
+                maze = new Maze(); //SE ELIMINA LOS DATOS DEL OBJETO MAZE. 
                 session.logout();
                 System.out.print("\nSesión Cerrada");
                 break; //VUELVE A UNLOGGED MENU
@@ -216,9 +216,8 @@ public class Main {
         }
         return exit; //DEVUELVE SI SE VUELVE A UNLOGGED MENU O SI FINALIZA EL PROGRAMA
     }
-    public static String[] mazesList() {
+    public static String[] mazesList() { //DEVUELVE LA LISTA DE LABERINTOS DISPONIBLES. ASÍ SI SE AÑADE ALGUNO EN TIEMPO DE EJECUCIÓN LO TENDRÁ ACTUALIZADO
         File mazesPath = new File(Config.getMAZES_PATH());
         return mazesPath.list();
-
     }
 }
