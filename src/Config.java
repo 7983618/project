@@ -10,24 +10,30 @@ public class Config {
 	/**
 	 *  Versión actual del programa
 	 */
-	private static String VERSION = "0.2.0";
+	public static final String VERSION = "0.2.0";
 	/** Ruta de los archivos */
-	private static String FILE_PATH = "./assets/files/";
-	private static String MAZES_PATH = "./assets/mazes/";
+	public static final String FILE_PATH = "./assets/files/";
+	public static final String MAZES_PATH = "./assets/mazes/";
 	/** Ruta de el fichero de usuarios */
-	private static String USERS_FILE = FILE_PATH + "users.txt";
+	public static String USERS_FILE = FILE_PATH + "users.txt";
 	/** Mensaje de bienvenida */
-	private static String WELCOME = "BIENVENIDO AL PROYECTO LABERITO.\nEste proyecto se encuentra en desarrollo. Actualmente se ha implementado y documentado toda la parte que tenga que ver con iniciar sessión siguiendo recomendaciones de Sonar. IMPORTANTE EJECUTAR DESDE EL CENTRO DEL PAQUETE, SINO NO ENCONTRARÁ CORRECTAMENTE LA RUTA DE LOS FICHEROS EXTERNOS";
+	public static final String hr = "-------------------------------------------\n";
+	public static final String WELCOME = hr + "BIENVENIDO AL PROYECTO LABERITO.\nEste proyecto se encuentra en desarrollo. Actualmente se ha implementado y documentado toda la parte que tenga que ver con iniciar sessión siguiendo recomendaciones de Sonar. IMPORTANTE EJECUTAR DESDE EL CENTRO DEL PAQUETE, SINO NO ENCONTRARÁ CORRECTAMENTE LA RUTA DE LOS FICHEROS EXTERNOS";
 	/** Mesnsaje de despedida */
-	private static String GOODBYE = "Hasta la proxima.\n";
+	public static final String GOODBYE = hr + "Hasta la proxima.\n";
 	/** Menú antes de loggear */
-	private static String UNLOGGED_MENU = 	"\n-----------------------------\n" +
+	public static final String UNLOGGED_MENU = 	hr +
+											"Elija una de las opciones\n" +
+											hr +
 										 	"1 Iniciar Sesión\n" +
 											"2 Registro\n" +
 											"0 Salir\n" +
-											"-----------------------------";
+											hr +
+											"Elección...";
 	/** Menú despues de loggear */
-	private static String LOGGED_MENU = 	"\n-----------------------------\n" +
+	public static final String LOGGED_MENU = 	hr +
+											"Elija una de las opciones\n" +
+											hr +
 											"1 Cargar laberinto\n" +
 											"2 Ver laberinto actual\n" +
 											"3 Establecer casillas de entrada y salida\n" +
@@ -35,18 +41,20 @@ public class Config {
 											"5 Ver usuario actual\n" +
 											"6 Cerrar sesión\n" +
 											"0 Salir\n" +
-											"-----------------------------";
-	private static String MAZE_MENU =		"-----------------------------\n" +
+											hr +
+											"Elección...";
+											
+	public static final String MAZE_MENU =		hr +
+											"Elija una de las opciones\n" +
+											hr +
 											"1 Introducir nombre de laberinto\n" +
 											"2 Listar laberintos disponibles\n" +
 											"0 Salir\n" +
-											"-----------------------------";											
+											hr +
+											"Elección...";										
 	/** Separador de campos de usuario en el fichero de usuarios */
-	private static String USER_REGEX = "#";
-	/** @return Versión actual del programa */
-	public static String getVERSION() {
-		return VERSION;
-	}
+	public static final String USER_REGEX = "#";
+
 	/** @return Ruta de los archivos */
 	public static String getFILE_PATH() {
 		return FILE_PATH;

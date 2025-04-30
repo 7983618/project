@@ -51,8 +51,8 @@ public class User {
 	/** @return Representación en cadena del usuario */
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", name=" + name + ", nif=" + nif + ", email=" + email + ", address="
-				+ address + ", birthdate=" + birthdate + ", role=" + role + "]";
+		return "Username:" + username + "\nName:" + name + "\nNif:" + nif + "\nEmail:" + email + "\nAddress:"
+				+ address + "\nBirthdate:" + birthdate + "\nRole:" + role;
 	}
 
 	/** @return Nombre de usuario */

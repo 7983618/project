@@ -110,7 +110,7 @@ public class Session {
 	 */
 	public static String[] requestLogin(){ //PIDE USUARIO Y CONTRASEÑA
 		String[] request = new String[2]; 
-		request[0] = fieldFormater("Username").toLowerCase();
+		request[0] = fieldFormater("-----------------------------\n" + "Username").toLowerCase();
 		request[1] = fieldFormater("Password");
 		return request;
 	}
@@ -154,7 +154,7 @@ public class Session {
 		
 		StringBuilder userLine = new StringBuilder();
 		while (true) { //PIDE USUARIO HASTA QUE SE PROPORCIONE UNO VÁLIDO
-			request[0] = fieldFormater("Username"); //PIDE USUARIO
+			request[0] = fieldFormater("-----------------------------\n" + "Username"); //PIDE USUARIO
 			request[0] = request[0].toLowerCase(); //TRASFORMA A MINUSCULAS
 			if (!readUsersFile(request[0],null)) { //SI USUARIO NO EXISTE
 				break; //CONTINUA PIDIENDO EL RESTO DE DATOS	
