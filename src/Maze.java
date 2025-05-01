@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Maze {
     //ARRAY DEL LABERINTO
@@ -10,12 +11,10 @@ public class Maze {
     //SI YA SE HA CARGADO UN LABERINTO
     private boolean loaded = false;
     //COORDENADAS
-    private int startI;
-    private int startJ;
-    private int endI;
-    private int endJ;
+    private int jStart, iStart, jEnd, iEnd;
     //SI YA SE HAN ESTABLECIDO LAS COORDENADAS.
     private boolean modified = false;
+    private Stack<Coordinate> way = new Stack<>();
 
     public Maze() {
     }
@@ -66,40 +65,58 @@ public class Maze {
         if (loaded) { //SI YA HAY UN LABERINTO CARGADO
             //SE CREA Y DEVUELVE UN STRING DEL LABERINTO
             StringBuilder maze = new StringBuilder();
-            for (int i = 0; i < map.length; i++) {
-                if (i == 0) {
-                    maze.append("  ");
-                    for (int j = 0; j < map[0].length; j++) {
-                        maze.append(j + " ");
-                    }
-                    maze.append("\n");
+            int countT = 10;
+            maze.append("     J >                 ");
+            for (int j = 0; j < map[0].length - 10; j++) {
+                maze.append(countT/10 + " ");
+                countT++;
+            }
+            maze.append("\n");
+            maze.append("     ");
+            int conutU = 0;
+            for (int j = 0; j < map[0].length; j++) {
+                if (conutU == 10) {
+                    conutU = conutU - 10;
                 }
-                maze.append(i + " ");
+                maze.append(conutU + " ");
+                conutU++;
+            }
+            maze.append("\nI ");
+            for (int i = 0; i < map.length; i++) {
+                if (i >= 10) {
+                    maze.append(i + " ");    
+                } else {
+                    maze.append(i + "  ");
+                }
                 for (int j = 0; j < map[0].length; j++) {
                     maze.append(map[i][j]+" ");
                 }
-                maze.append("\n");
+                if (i == 0) {
+                    maze.append("\nv ");
+                } else {
+                    maze.append("\n  ");
+                }
             }
-            return maze.toString().substring(0, maze.toString().length()-1);
+            return maze.toString().substring(0, maze.toString().length()-2);
         }
         //DEVUELVE MENSAJE DE ERROR
         return "NO SE HA CARGADO UN LABERINTO TODAVÍA";
     }
     //ESTABLECE COORDENADAS DE ENTRADA Y SALIDA
-    public boolean setEntranceExit(int xStart, int yStart, int xEnd, int yEnd) { 
+    public boolean setEntranceExit(int jStart, int iStart, int jEnd, int iEnd) { 
         if (loaded) { //SI ESTA CARGADO
             if (modified) { //SI YA SE HAN ESTABLECIDO COORDENADAS
                 loadMaze(filename); //SE VUELVE A CARGAR PARA ELIMINAR LAS ENTRADAS ANTERIORES
             }
             //SE ESTABLECEN LAS ENTRADAS (posible cambio por como se nombran a los ejes)
-            startI = yStart;
-            startJ = xStart;
-            endI = yEnd;
-            endJ = xEnd;
+            this.jStart = jStart;
+            this.iStart = iStart;
+            this.jEnd = jEnd;
+            this.iEnd = iEnd;
             //ESTABLECE ENTRADA (S)TART
-            map[startI][startJ] = 'S';
+            map[iStart][jStart] = 'S';
             //ESTALECE SALIDA (E)ND
-            map[endI][endJ] = 'E';
+            map[iEnd][jEnd] = 'E';
             //SE HA MODIFICADO EL LABERINTO. POR LO QUE SI SE VULVE HA ESTALECER ENTRADA Y SALIDA NO SE VOLVERÁ A CONTAR EL EL TAMAÑO DEL LABERINTO EN EL FICHERO
             modified = true;
             return true;
@@ -120,11 +137,39 @@ public class Maze {
         return map.length;
     }
     //DEVUELVE SI LAS COORDENADAS SON UN MURO
-    public boolean isWall(int x, int y) {
-        if (map[x][y] == '#') {
+    public boolean isWall(int j, int i) {
+        if (map[i][j] == '#') {
             return true;
         } else {
             return false;
         }
+    }
+
+    public void readWay() {
+        if (modified) {
+            way.push(new Coordinate(jStart, iStart));
+            int times = 0;
+            while (times <= 30) {
+                Coordinate last = way.peek();
+                while (isWall(last.nextJ(), last.nextI())) {
+                    Coordinate.rotate();
+                }
+                way.push(new Coordinate(last.nextJ(), last.nextI()));
+                if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                    map[last.i][last.j] = last.storedDirection;
+                }
+                times ++;
+            }
+            
+            System.out.println(showMap());
+            System.out.println(wayString());
+        }
+    }
+    private String wayString() {
+        StringBuilder s = new StringBuilder();
+        for (Coordinate coordinate : way) {
+            s.append(way.indexOf(coordinate) + " " + coordinate.toString());
+        }
+        return s.toString();
     }
 }

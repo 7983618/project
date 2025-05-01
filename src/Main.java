@@ -35,6 +35,7 @@ public class Main {
                     }
                 } else { //FRACASO EN INICIO DE SESIÓN
                     System.out.println(Config.hr + "El usuario o la contraseña no coinciden");
+                    option = -1;
                 }
             } else if (option == 2) { //INICIA PROCCESO DE REGISTRO
                 if (session.signup()) { //EXITO AL REGISTRAR USUARIO E INICIAR SESIÓN CON ÉL
@@ -70,11 +71,11 @@ public class Main {
             if (option == 1) {
                 loadMaze();
             } else if (option == 2) { 
-                System.out.println(maze.showMap()); //MUESTRA EL MAPA DEL LABERINTO SI ESTA CARGADO, SINO MUESTRA MENSAJE DE QUE FALTA CARGAR
+                System.out.println(Config.hr + maze.showMap()); //MUESTRA EL MAPA DEL LABERINTO SI ESTA CARGADO, SINO MUESTRA MENSAJE DE QUE FALTA CARGAR
             } else if (option == 3) { //PIDE COORDENADAS DE ENTRADA Y SALIDA DEL LABERINTO CARGADO
                 setCoordinates();
             } else if (option == 4) { //OPCION 4 SIN DESARROLLAR
-                System.out.println("PRÓXIMAMENTE");
+                maze.readWay();
             } else if (option == 5) { //INFORMACIÓN DEL USUARIO ACTUAL
                 System.out.println(Config.hr + session.showUser());
             } else if (option == 6) { //CERRAR SESIÓN Y VOLVER AL UNLOGGED MENU
@@ -149,31 +150,27 @@ public class Main {
     private static void setCoordinates() {
         //COMPRUEBA SI ESTA CARGADO
         if (maze.isLoaded()) {
-            int xStart = -1;
-            int yStart = -1;
-            int xEnd = -1;
-            int yEnd = -1;
+            int jStart = -1;
+            int iStart = -1;
+            int jEnd = -1;
+            int iEnd = -1;
             //PEDIMOS COORDENADAS HASTA QUE SEAN VÁLIDAS
             boolean correctFormat = false;
             while (!correctFormat) {
-                System.out.println("Introduce unas coordenadas válidas");
-                System.out.println("-Deben existir en el mapa");
-                System.out.println("-No deben ser un muro");
-                System.out.println("-No pueden ser iguales las coordenadas de salida y entrada");
-                
-                System.out.println("Coordenada de entrada (Start) X...");
-                xStart = scannerInt();
-                System.out.println("Coordenada de entrada (Start) Y...");
-                yStart = scannerInt();
-                System.out.println("Coordenada de salida (End) X...");
-                xEnd = scannerInt();
-                System.out.println("Coordenada de salida (End) Y...");
-                yEnd = scannerInt();
+                System.out.println(Config.START_EXIT_CONDITIONS);
+                System.out.println(Config.hr + "Coordenada de entrada (Start) J...");
+                jStart = scannerInt();
+                System.out.println("Coordenada de entrada (Start) I...");
+                iStart = scannerInt();
+                System.out.println("Coordenada de salida (End) J...");
+                jEnd = scannerInt();
+                System.out.println("Coordenada de salida (End) I...");
+                iEnd = scannerInt();
                 //COMPROBAMOS SI SON VALIDAS
-                if (xStart >= 0 && xStart < maze.getXSize() && yStart >= 0 && yStart < maze.getYSize() && xEnd >= 0 && xEnd < maze.getXSize() && yEnd >= 0 && yEnd < maze.getYSize() && !maze.isWall(xStart, yStart) && !maze.isWall(xEnd, yEnd) && !(xStart==xEnd && yStart==yEnd)) {
+                if (jStart >= 0 && jStart < maze.getXSize() && iStart >= 0 && iStart < maze.getYSize() && jEnd >= 0 && jEnd < maze.getXSize() && iEnd >= 0 && iEnd < maze.getYSize() && !maze.isWall(jStart, iStart) && !maze.isWall(jEnd, iEnd) && !(jStart==jEnd && iStart==iEnd)) {
                     //DEJAMOS DE PEDIR COORDENADAS Y ESTABLECEMOS LAS QUE HEMOS RECIVIDO
                     correctFormat = true;
-                    maze.setEntranceExit(xStart, yStart, xEnd, yEnd);
+                    maze.setEntranceExit(jStart, iStart, jEnd, iEnd);
                 }
                 
             }

@@ -51,7 +51,12 @@ public class Config {
 											"2 Listar laberintos disponibles\n" +
 											"0 Salir\n" +
 											hr +
-											"Elección...";										
+											"Elección...";
+	public static final String START_EXIT_CONDITIONS =  hr + 
+														"Introduce unas coordenadas válidas\n" +
+														"-Deben existir en el mapa\n" +
+														"-No deben ser un muro\n" +
+														"-No pueden ser iguales las coordenadas de salida y entrada";
 	/** Separador de campos de usuario en el fichero de usuarios */
 	public static final String USER_REGEX = "#";
 
