@@ -144,21 +144,59 @@ public class Maze {
             return false;
         }
     }
+    public boolean isRedWall(int j, int i) {
+        if (map[i][j] == 'x') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public void readWay() {
         if (modified) {
             way.push(new Coordinate(jStart, iStart));
             int times = 0;
-            while (times <= 30) {
+            while (times != 3) {
                 Coordinate last = way.peek();
-                while (isWall(last.nextJ(), last.nextI())) {
+                //CONTAMOS LAS VECES QUE VUELVE A LA ENTRADA. DEBEN SER TRES (INCLUYENDO EL PRIMER PASO QUE ES LA ENTRADA)
+                if (last.i == iStart && last.j == jStart) {
+                    times++;
+                } if (times == 3) {
+                    continue; //Asi no ejecuto el resto del codigo y puedo contar con la coordenada del paso actual
+                }
+                //SI TIENE LIBRE POR LA DERECHA GIRA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO)
+                if (!isWall(last.rightJ(), last.rightI())) {
                     Coordinate.rotate();
+                    last.storedDirection = last.direction();
                 }
-                way.push(new Coordinate(last.nextJ(), last.nextI()));
-                if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
-                    map[last.i][last.j] = last.storedDirection;
+                while (isWall(last.nextJ(), last.nextI()) || isRedWall(last.nextJ(), last.nextI())) {
+                    Coordinate.rotatePi();
+                    last.storedDirection = last.direction();
                 }
-                times ++;
+                boolean create = true;
+                //CON ESTO BORRAMOS LOS "PASOS" SI HEMOS VUELTO SOBRE NUESTOS PASOS
+                if (way.size() >= 2) {
+                    if (last.nextI() == way.get(way.size()-2).i && last.nextJ() == way.get(way.size()-2).j) {
+                        if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                            map[last.i][last.j] = 'x';
+                        } 
+                        way.pop();
+                        create = false;
+                    }
+                }
+                //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO. SIEMPRE TENDREMOS LIBRE PORQUE NOS ASEGURAMOS CON LOS METODOS ANTERIORES
+                if (create) {
+                    way.push(new Coordinate(last.nextJ(), last.nextI()));
+                    if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                        map[last.i][last.j] = last.storedDirection;
+                    }  
+                }
+                try {
+                    Thread.sleep(100); // 5000 milisegundos = 5 segundos
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(showMap());
             }
             
             System.out.println(showMap());

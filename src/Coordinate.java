@@ -10,6 +10,22 @@ public class Coordinate {
         this.i = i;
         this.storedDirection = direction();
     }
+    public int rightI() {
+        if (advance == 2) {
+            return i - 1;
+        } else if (advance == 4) {
+            return i + 1;
+        }
+        return i;
+    }
+    public int rightJ() {
+        if (advance == 1) {
+            return j + 1;
+        } else if (advance == 3) {
+            return j - 1;
+        }
+        return j;
+    }
     public int nextJ() {
         if (advance == 2) {
             return j - 1;
@@ -26,12 +42,19 @@ public class Coordinate {
         }
         return i;
     }
-    public static void rotate() {
+    public static void rotatePi() {
         if (advance == 4) {
             advance = 1;
             return;
         }
         advance++;
+    }
+    public static void rotate() {
+        if (advance == 1) {
+            advance = 4;
+            return;
+        }
+        advance--;
     }
     public char direction() {
         if (advance == 1) {
