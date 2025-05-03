@@ -60,6 +60,10 @@ public class Config {
 	/** Separador de campos de usuario en el fichero de usuarios */
 	public static final String USER_REGEX = "#";
 
+	public static final char RED_WAY_WALL = '.';
+	public static final char YELLOW_WAY_WALL = ':';
+	public static final int speed = 50;
+
 	/** @return Ruta de los archivos */
 	public static String getFILE_PATH() {
 		return FILE_PATH;

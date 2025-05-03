@@ -76,6 +76,7 @@ public class Main {
                 setCoordinates();
             } else if (option == 4) { //OPCION 4 SIN DESARROLLAR
                 maze.readWay();
+                maze.yellowWay();
             } else if (option == 5) { //INFORMACIÓN DEL USUARIO ACTUAL
                 System.out.println(Config.hr + session.showUser());
             } else if (option == 6) { //CERRAR SESIÓN Y VOLVER AL UNLOGGED MENU
