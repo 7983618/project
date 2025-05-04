@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -15,7 +16,7 @@ public class Maze {
     //SI YA SE HAN ESTABLECIDO LAS COORDENADAS.
     private boolean coordinates = false;
     private boolean redWalls = false;
-    private Stack<Coordinate> path = new Stack<>();
+    private ArrayList<Stack<Coordinate>> additionalPaths = new ArrayList<>();
 
     public Maze() {
     }
@@ -108,6 +109,7 @@ public class Maze {
         if (loaded) { //SI ESTA CARGADO
             if (coordinates) { //SI YA SE HAN ESTABLECIDO COORDENADAS
                 loadMaze(filename); //SE VUELVE A CARGAR PARA ELIMINAR LAS ENTRADAS ANTERIORES
+                additionalPaths = new ArrayList<>();
             }
             //SE ESTABLECEN LAS ENTRADAS (posible cambio por como se nombran a los ejes)
             this.jStart = jStart;
@@ -136,6 +138,13 @@ public class Maze {
     //DEVULVE EL TAMAÑO DEL EJE Y
     public int getYSize() {
         return map.length;
+    }
+
+    public boolean isCoordinates() {
+        return coordinates;
+    }
+    public boolean isRedWalls() {
+        return redWalls;
     }
     //DEVUELVE SI LAS COORDENADAS SON UN MURO
     public boolean isWall(int j, int i) {
@@ -166,30 +175,64 @@ public class Maze {
             return false;
         }
     }
+    private boolean isBlockChanceWall(int j, int i) {
+        if (map[i][j] == Config.BLOCK_CHANCE_WALL) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private boolean isStartCoordinate(Coordinate coordinate) {
+        if (coordinate.i == iStart && coordinate.j == jStart) {
+            return true;
+        }
+        return false;
+    }
+    private boolean isEndCoordinate(Coordinate coordinate) {
+        if (coordinate.i == iEnd && coordinate.j == jEnd) {
+            return true;
+        }
+        return false;
+    }
+    private int chances(Coordinate coordinate) {
+        int chances = 0;
+        if (map[coordinate.i-1][coordinate.j] == ' ') {
+            chances++;
+        }
+        if (map[coordinate.i][coordinate.j-1] == ' ') {
+            chances++;
+        }
+        if (map[coordinate.i+1][coordinate.j] == ' ') {
+            chances++;
+        }
+        if (map[coordinate.i][coordinate.j+1] == ' ') {
+            chances++;
+        }
+        return chances;
+    }
 
-    public void readWay() {
+    private void redWay() {
+        Stack<Coordinate> path = new Stack<>();
         if (coordinates) {
-            path.push(new Coordinate(jStart, iStart));
-            int chances = 0;
-            for (int i = 0; i < 4; i++) {
-                if (map[path.peek().rightI()][path.peek().rightJ()] == ' ') {
-                    chances++;
-                }
-                Coordinate.rotate();
-            }
-            
+            Coordinate first = new Coordinate(jStart, iStart);
+            path.push(first);
+            int chances = chances(first);
             int times = 0;
+            boolean makewalls = true;
             while (times != chances+1) {
                 Coordinate last = path.peek();
                 //CONTAMOS LAS VECES QUE VUELVE A LA ENTRADA. DEBEN SER EL NUMERO DE ALTERNATIVAS QUE TIENE EL INICIO + EL PRIMER PASO QUE ES LA ENTRADA
-                if (last.i == iStart && last.j == jStart) {
+                if (isStartCoordinate(last)) {
                     times++;
-                    clearPath(); //borramos el camino
+                    clearPath(path); //borramos el camino
                 } if (times == chances+1) {
                     continue; //Asi no ejecuto el resto del codigo y puedo contar con la coordenada del paso actual
                 }
                 //SI TIENE LIBRE POR LA DERECHA GIRA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO)
-                if (!isWall(last.rightJ(), last.rightI())) {
+                if (isEndCoordinate(last)) {
+                    makewalls = false;
+                }
+                if (!(isWall(last.rightJ(), last.rightI()))) {
                     Coordinate.rotate();
                     last.storedDirection = last.direction();
                 }
@@ -200,9 +243,14 @@ public class Maze {
                 boolean create = true;
                 //CON ESTO BORRAMOS LOS "PASOS" SI HEMOS VUELTO SOBRE NUESTOS PASOS
                 if (path.size() >= 2) {
-                    if (last.nextI() == path.get(path.size()-2).i && last.nextJ() == path.get(path.size()-2).j) {
-                        if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
-                            map[last.i][last.j] = Config.RED_WAY_WALL;
+                    Coordinate penultimate = path.get(path.size()-2);
+                    if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) {
+                        if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
+                            if (makewalls) {
+                                map[last.i][last.j] = Config.RED_WAY_WALL;
+                            } else {
+                                map[last.i][last.j] = ' ';
+                            }
                         } 
                         path.pop();
                         create = false;
@@ -211,12 +259,13 @@ public class Maze {
                 //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO. SIEMPRE TENDREMOS LIBRE PORQUE NOS ASEGURAMOS CON LOS METODOS ANTERIORES
                 if (create) {
                     path.push(new Coordinate(last.nextJ(), last.nextI()));
-                    if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                    if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
                         map[last.i][last.j] = last.storedDirection;
+                        makewalls = true;
                     }  
                 }
                 try {
-                    Thread.sleep(Config.speed); // 5000 milisegundos = 5 segundos
+                    Thread.sleep(Config.RED_WAY_SPEED); // 5000 milisegundos = 5 segundos
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -224,42 +273,58 @@ public class Maze {
             }
             redWalls = true; //EL MAPA SE HA MODIFICADO
             System.out.println(showMap());
-            System.out.println(pathString());
-            path = new Stack<>(); //EL CAMINO ES RESTAURADO
+            System.out.println(pathString(path));
         }
     }
-    
-    public void yellowWay() {
+    private Stack<Coordinate> yellowWay() {
+        System.out.println("CAMINO AMARILLO");
+        Stack<Coordinate> path = new Stack<>();
+        boolean clear = false;
         if (coordinates && redWalls) { //SI SE HAN ESTABLECIDO COORDENADAS Y SE HAN PUESTO MUROS
             path.push(new Coordinate(jStart, iStart));
-            while (true) {
+            int times = 0;
+            
+            while (true && times < 4) {
                 Coordinate last = path.peek();
-                if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
                     last.storedDirection = last.direction();
                     map[last.i][last.j] = last.storedDirection;
                 }
-                if (last.i == iEnd && last.j == jEnd) {
+                if (isEndCoordinate(last)) {
                     break;
                 }
                 //SI TIENE LIBRE POR LA DERECHA GIRA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO)
-                if (!(isWall(last.rightJ(), last.rightI()) || isRedWall(last.j, last.i) || isYellowWay(last.rightJ(), last.rightI()) || isYellowWall(last.rightJ(), last.rightI()) )) {
+                if (!(isWall(last.rightJ(), last.rightI()) || isRedWall(last.j, last.i) || isYellowWay(last.rightJ(), last.rightI()) || isYellowWall(last.rightJ(), last.rightI()) || isBlockChanceWall(last.rightJ(), last.rightI()))) {
                     Coordinate.rotate();
                     last.storedDirection = last.direction();
                 }
-                while (isWall(last.nextJ(), last.nextI()) || isRedWall(last.nextJ(), last.nextI()) || isYellowWay(last.nextJ(), last.nextI()) || isYellowWall(last.nextJ(), last.nextI())) {
-                    if (path.size() >=2 && last.nextI() == path.get(path.size()-2).i && last.nextJ() == path.get(path.size()-2).j) {
-                        break;
+                
+                times = 0;
+                while ((isWall(last.nextJ(), last.nextI()) || isRedWall(last.nextJ(), last.nextI()) || isYellowWay(last.nextJ(), last.nextI()) || isYellowWall(last.nextJ(), last.nextI()) || isBlockChanceWall(last.nextJ(), last.nextI())) && times < 4) {
+                    if (path.size() >=2) {
+                        Coordinate penultimate = path.get(path.size()-2);
+                        if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) {
+                            break;
+                        }
+                            
                     }
                     Coordinate.rotatePi();
+                    times++;
                     last.storedDirection = last.direction();
+                }
+                if (times >= 4) {
+                    clear = true;
                 }
                 //CON ESTO BORRAMOS LOS "PASOS" SI HEMOS VUELTO SOBRE NUESTOS PASOS
                 boolean create = true; //SI BORRAMOS NO HACE FALTA CREAR UN PASO MÁS
                 if (path.size() >= 2) {
-                    if (last.nextI() == path.get(path.size()-2).i && last.nextJ() == path.get(path.size()-2).j) {
-                        if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                    Coordinate penultimate = path.get(path.size()-2);
+                    if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) {
+                        
+                        if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
                             map[last.i][last.j] = Config.YELLOW_WAY_WALL;
-                        } 
+                        }
+                        
                         path.pop();
                         create = false;
                     }
@@ -267,45 +332,119 @@ public class Maze {
                 //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO. SIEMPRE TENDREMOS LIBRE PORQUE NOS ASEGURAMOS CON LOS METODOS ANTERIORES
                 if (create) {
                     path.push(new Coordinate(last.nextJ(), last.nextI()));
-                    if (!(last.i == iStart && last.j == jStart) && !(last.i == iEnd && last.j == jEnd)) {
+                    if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
                         map[last.i][last.j] = last.storedDirection;
                     }  
                 }
                 try {
-                    Thread.sleep(Config.speed); // 5000 milisegundos = 5 segundos
+                    Thread.sleep(Config.YELLOW_WAY_SPEED); // 5000 milisegundos = 5 segundos
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 System.out.println(showMap());
             }
+        }
+        System.out.println(showMap());
+        if (clear) {
+            path.clear();
+        }
+        additionalPaths.add(path);
+        return path;
+    }
+    
+    public void firstPath() {
+        redWay();
+        String traceroute = pathString(yellowWay());
+        clearYellowWayWalls();
+        System.out.println(showMap());
+        System.out.println(traceroute);
+    }
+    public void shortestPath() {
+        if (redWalls) {
             clearYellowWayWalls();
-            System.out.println(showMap());
-            clearPath();
-            System.out.println(pathString());
+            for (int i = 0; i < additionalPaths.size(); i++) {
+                Stack<Coordinate> auxPath = additionalPaths.get(i);
+                for (int j = auxPath.size()-1; j >= 0; j--) {
+                    Coordinate aux = auxPath.get(j);
+                    if (chances(aux) > 0 && !(isEndCoordinate(aux) && isStartCoordinate(aux))) {                   
+                        Coordinate auxToWall = auxPath.get(j-1);
+                        map[auxToWall.i][auxToWall.j] = Config.BLOCK_CHANCE_WALL;
+                        clearYellowWay();
+                        yellowWay();
+                        clearYellowWayWalls();
+                        break;
+                    }
+                }
+            }
+            ArrayList<Stack<Coordinate>> filteredPaths = new ArrayList<>();
+            for (Stack<Coordinate> path : additionalPaths) {
+                if (!path.isEmpty()) {
+                    filteredPaths.add(path);
+                }
+            }
+            additionalPaths = filteredPaths;
+            if (additionalPaths.isEmpty()) {
+                System.out.println("LA SALIDA NO HA SIDO DESCARTADA POR EL CAMINO ROJO. SE DEBE A UN PROBLEMA EN EL ALGORITMO");
+            } else {
+                Stack<Coordinate> shortestPath = additionalPaths.get(0); 
+                for (int i = 1; i < additionalPaths.size(); i++) {
+                    if (additionalPaths.get(i).size() < shortestPath.size()) {
+                        shortestPath = additionalPaths.get(i);
+                    }
+                }
+                String traceroute = pathString(shortestPath);
+                setEntranceExit(jStart, iStart, jEnd, iEnd);
+                
+                for (Coordinate coordinate : shortestPath) {
+                    if (!(isStartCoordinate(coordinate) || isEndCoordinate(coordinate))) {
+                        map[coordinate.i][coordinate.j] = coordinate.storedDirection;
+                    }
+                }
+                System.out.println(Config.hr + "CAMINO MÁS CORTO\n" + Config.hr);
+                
+                
+                System.out.println(showMap());
+                System.out.println(traceroute);
+            }
         }
     }
+    public void newSearh() {
+        setEntranceExit(jStart, iStart, jEnd, iEnd);
+        redWalls = false;
+    }
+    
     private void clearYellowWayWalls() {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
-                if (map[i][j] == ':') {
+                if (map[i][j] == Config.YELLOW_WAY_WALL) {
+                    map[i][j] = ' ';
+                }
+            }
+        }
+    }
+    private void clearYellowWay() {
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                if (map[i][j] == '^' || map[i][j] == '<' || map[i][j] == 'v' || map[i][j] == '>') {
                     map[i][j] = ' ';
                 }
             }
         }
     }
     
-    private void clearPath() {
+    private void clearPath(Stack<Coordinate> path) {
         for (Coordinate coordinate : path) {
             if (!(coordinate.i == iStart && coordinate.j == jStart) && !(coordinate.i == iEnd && coordinate.j == jEnd)) {
                 map[coordinate.i][coordinate.j] = ' ';   
             }
         }
     }
-    private String pathString() {
+    private String pathString(Stack<Coordinate> path) {
         StringBuilder s = new StringBuilder();
         for (Coordinate coordinate : path) {
-            s.append(path.indexOf(coordinate) + " " + coordinate.toString());
+            s.append(path.indexOf(coordinate) + " | " + coordinate.toString());
         }
         return s.toString();
     }
+
 }

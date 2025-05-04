@@ -75,8 +75,11 @@ public class Main {
             } else if (option == 3) { //PIDE COORDENADAS DE ENTRADA Y SALIDA DEL LABERINTO CARGADO
                 setCoordinates();
             } else if (option == 4) { //OPCION 4 SIN DESARROLLAR
-                maze.readWay();
-                maze.yellowWay();
+                if (maze.isCoordinates()) {
+                    searhPath();
+                } else {
+                    System.out.println(Config.hr + "Primero hay que establecer coordenadas");
+                }
             } else if (option == 5) { //INFORMACIÓN DEL USUARIO ACTUAL
                 System.out.println(Config.hr + session.showUser());
             } else if (option == 6) { //CERRAR SESIÓN Y VOLVER AL UNLOGGED MENU
@@ -176,11 +179,30 @@ public class Main {
                 
             }
         } else {
-            System.out.println("NO SE HA CARGADO UN LABERINTO TODAVÍA");
+            System.out.println(Config.hr + "NO SE HA CARGADO UN LABERINTO TODAVÍA");
             
         }
     }
 
+    private static void searhPath() {
+        int option = -1;
+        while (option != 0) {
+            System.out.println(Config.SEARCH_PATH_MENU);
+            option = scannerInt();
+            if (option == 1) {
+                maze.firstPath();
+            } else if (option == 2) {
+                if (maze.isRedWalls()) {
+                    maze.shortestPath();
+                } else {
+                    System.out.println(Config.hr);
+                    System.out.println("No se ha hecho la primera ruta todavia");
+                }
+            } else if (option == 3) {
+                maze.newSearh();
+            }
+        }
+    }
     /**
      * Lee un entero desde el teclado.
      * 

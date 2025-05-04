@@ -72,7 +72,7 @@ public class Coordinate {
     }
     @Override
     public String toString() {
-        return "J: " + j + ", I: " + i + "D:" + storedDirection + "\n";
+        return "j: " + j + " | I: " + i + " | D: " + storedDirection + "\n";
     }
     
     

@@ -10,7 +10,7 @@ public class Config {
 	/**
 	 *  Versión actual del programa
 	 */
-	public static final String VERSION = "0.2.0";
+	public static final String VERSION = "1.0.0";
 	/** Ruta de los archivos */
 	public static final String FILE_PATH = "./assets/files/";
 	public static final String MAZES_PATH = "./assets/mazes/";
@@ -18,7 +18,7 @@ public class Config {
 	public static String USERS_FILE = FILE_PATH + "users.txt";
 	/** Mensaje de bienvenida */
 	public static final String hr = "-------------------------------------------\n";
-	public static final String WELCOME = hr + "BIENVENIDO AL PROYECTO LABERITO.\nEste proyecto se encuentra en desarrollo. Actualmente se ha implementado y documentado toda la parte que tenga que ver con iniciar sessión siguiendo recomendaciones de Sonar. IMPORTANTE EJECUTAR DESDE EL CENTRO DEL PAQUETE, SINO NO ENCONTRARÁ CORRECTAMENTE LA RUTA DE LOS FICHEROS EXTERNOS";
+	public static final String WELCOME = hr + "BIENVENIDO AL PROYECTO LABERITO.\n Por la propia naturaleza del algoritmo que usa para resolver los laberintos, puede que falle al encontrar el laberinto más corto dado que se bloquea un punto que no debería bloquearse ya que el camino rojo lo debería haber descartado. Esto solo ocurre cuando el camino rojo vuelve al punto de entrada desde un punto de donde no salió, entones no termina de desartar todos los puntos muertos del laberinto.";
 	/** Mesnsaje de despedida */
 	public static final String GOODBYE = hr + "Hasta la proxima.\n";
 	/** Menú antes de loggear */
@@ -57,12 +57,24 @@ public class Config {
 														"-Deben existir en el mapa\n" +
 														"-No deben ser un muro\n" +
 														"-No pueden ser iguales las coordenadas de salida y entrada";
+
+	public static final String SEARCH_PATH_MENU = 	hr +
+													"Selecciona un camino\n" +
+													hr +
+													"1 El primer camino posible\n" +
+													"2 El camino más corto\n" +
+													"3 Restaurar (para volver a buscar)\n" +
+													"0 Salir\n" +
+													hr +
+													"Eleción...";
 	/** Separador de campos de usuario en el fichero de usuarios */
 	public static final String USER_REGEX = "#";
 
 	public static final char RED_WAY_WALL = '.';
-	public static final char YELLOW_WAY_WALL = ':';
-	public static final int speed = 50;
+	public static final char YELLOW_WAY_WALL = 'x';
+	public static final char BLOCK_CHANCE_WALL = 'N';
+	public static final int RED_WAY_SPEED = 50;
+	public static final int YELLOW_WAY_SPEED = 50;
 
 	/** @return Ruta de los archivos */
 	public static String getFILE_PATH() {
