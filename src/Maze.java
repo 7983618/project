@@ -15,9 +15,11 @@ public class Maze {
     private int jStart, iStart, jEnd, iEnd;
     //SI YA SE HAN ESTABLECIDO LAS COORDENADAS.
     private boolean coordinates = false;
+    //SI YA HA PASADO EL CAMINO ROJO SOBRE EL MAPA
     private boolean redWalls = false;
+    //AQUI ALMACENAMOS TODOS LOS CAMINOS POSIBLES
     private ArrayList<Stack<Coordinate>> additionalPaths = new ArrayList<>();
-
+    //CONSTRUCTOR VACÍO
     public Maze() {
     }
     //LEE EL FICHERO Y CREA EL MAPA EN EL ARRAY
@@ -63,6 +65,7 @@ public class Maze {
         }
         
     }
+    //STRING CON EL MAPA FORMATEADO. PARA VER EL RESULTADO FINAL Y EL PROCESO
     public String showMap() {
         if (loaded) { //SI YA HAY UN LABERINTO CARGADO
             //SE CREA Y DEVUELVE UN STRING DEL LABERINTO
@@ -139,14 +142,15 @@ public class Maze {
     public int getYSize() {
         return map.length;
     }
-
+    //DEVUELVE SI YA SE HAN ESTABLECIDO LAS COORDENADAS
     public boolean isCoordinates() {
         return coordinates;
     }
+    //DEVUELVE SI EL CAMINO ROJO YA HA PUESTO SUS "MUROS" EN LOS CAMINOS SIN SALIDA
     public boolean isRedWalls() {
         return redWalls;
     }
-    //DEVUELVE SI LAS COORDENADAS SON UN MURO
+    //DEVUELVE SI LAS COORDENADAS SON UN MURO DEL LABERINTO ORIGINAL "#"
     public boolean isWall(int j, int i) {
         if (map[i][j] == '#') {
             return true;
@@ -154,6 +158,7 @@ public class Maze {
             return false;
         }
     }
+    //DEVUELVE SI LAS COORDENADAS SON UN MURO PUESTO POR EL CAMINO ROJO AL DESCARTAR CAMINOS SIN SALIDA
     private boolean isRedWall(int j, int i) {
         if (map[i][j] == Config.RED_WAY_WALL) {
             return true;
@@ -161,6 +166,7 @@ public class Maze {
             return false;
         }
     }
+    //DEVUELVE SI LAS COORDENADAS SON UN MURO PUESTO POR EL CAMINO AMARILLO AL DESCARTAR CAMINOS SIN SALIDA
     private boolean isYellowWall(int j, int i) {
         if (map[i][j] == Config.YELLOW_WAY_WALL) {
             return true;
@@ -168,6 +174,7 @@ public class Maze {
             return false;
         }
     }
+    //DEVUELVE SI LAS COORDENADAS FORMA PARTE DEL RECORRIDO DEL CAMINO AMARILLO
     private boolean isYellowWay(int j, int i) {
         if (map[i][j] == '^' || map[i][j] == '<' || map[i][j] == 'v' || map[i][j] == '>') {
             return true;
@@ -175,6 +182,7 @@ public class Maze {
             return false;
         }
     }
+    //DEVUELVE SI LAS COORDENADAS SON UN MURO DE DESCARTE. ESTOS FUNCIONAN PARA OBLIGAR AL CAMINO A TOMAR OTRA RUTA Y ASÍ ALMACENAR TODOS LOS CAMINOS POSIBLES
     private boolean isBlockChanceWall(int j, int i) {
         if (map[i][j] == Config.BLOCK_CHANCE_WALL) {
             return true;
@@ -182,18 +190,21 @@ public class Maze {
             return false;
         }
     }
+    //SI LA COORDENADA ES LA COORDENADA DE ENTRADA
     private boolean isStartCoordinate(Coordinate coordinate) {
         if (coordinate.i == iStart && coordinate.j == jStart) {
             return true;
         }
         return false;
     }
+    //SI LA COORDENADA ES LA COORDENADA DE SALIDA
     private boolean isEndCoordinate(Coordinate coordinate) {
         if (coordinate.i == iEnd && coordinate.j == jEnd) {
             return true;
         }
         return false;
     }
+    //DEVUELVE LA CANTIDAD DE VÍAS LIBRES QUE TIENE UNA COORDENADA
     private int chances(Coordinate coordinate) {
         int chances = 0;
         if (map[coordinate.i-1][coordinate.j] == ' ') {
@@ -210,18 +221,26 @@ public class Maze {
         }
         return chances;
     }
-
+    //ES EL PRIMER "RECORRIDO" PARA LA RESOLUCIÓN DEL LABERINTO. LA FUNCIÓN DE ESTE RECORRIDO NO ES ENCONTRAR LA SALIDA. SINO DESCARTAR LOS CAMINOS SIN SALIDA CREADO LOS "MUROS ROJOS"
     private void redWay() {
+        //AQUI SE ALMACENA EL RECORRIDO
         Stack<Coordinate> path = new Stack<>();
+        //SOLO SE EJEUTA SI SE HAN ESTABLEIDO LAS COORDENADAS DE ENTRADA Y SALIDA
         if (coordinates) {
+            //CREAMOS LA PRIMERA COORDENADA Y LO METEMOS EN EL CAMINO
             Coordinate first = new Coordinate(jStart, iStart);
             path.push(first);
+            //ALMACENAMOS LAS VIAS LIBRES QUE TIENE LA ENTRADA PORQUE SON LAS VECES QUE EL CAMINO ROJO TENDRÁ QUE VOLVER A LA ENTRADA
             int chances = chances(first);
+            //CONTADOR DE LAS VECES QUE VUELVE A LA ENTRADA
             int times = 0;
+            //CON ESTO LE INDICAMOS SI DEBE CREAR MUROS. CON ESTO PODEMOS DESACTIVAR LA CREACIÓN DE MUROS SI ENCUENTRA LA SALIDA PARA QUE NO LA CONFUNDA CON UN CAMINO SIN SALIDA Y LA BLOQUEE
             boolean makewalls = true;
+            //MIENTRAS NO HAYA ESTADO EN LA ENTRADA LA CANIDAD DE VIAS LIBRE QUE TIENE LA ENTRADA + LA PRIMERA DEL PRINCIPIO
             while (times != chances+1) {
+                //LA ÚLTIMA COORDENADA DEL CAMINO
                 Coordinate last = path.peek();
-                //CONTAMOS LAS VECES QUE VUELVE A LA ENTRADA. DEBEN SER EL NUMERO DE ALTERNATIVAS QUE TIENE EL INICIO + EL PRIMER PASO QUE ES LA ENTRADA
+                //AUMENTAMOS EL CONTADOR SI LA ULTIMA ES LA ENTRADA
                 if (isStartCoordinate(last)) {
                     times++;
                     clearPath(path); //borramos el camino
