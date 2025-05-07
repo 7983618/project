@@ -112,7 +112,7 @@ public class Maze {
         if (loaded) { //SI ESTA CARGADO
             if (coordinates) { //SI YA SE HAN ESTABLECIDO COORDENADAS
                 loadMaze(filename); //SE VUELVE A CARGAR PARA ELIMINAR LAS ENTRADAS ANTERIORES
-                additionalPaths = new ArrayList<>();
+                additionalPaths = new ArrayList<>(); //ELIMINAMOS TODOS LOS CAMINOS ALMACENADOS QUE HAYAMOS ENCONTRADO
             }
             //SE ESTABLECEN LAS ENTRADAS (posible cambio por como se nombran a los ejes)
             this.jStart = jStart;
@@ -243,14 +243,15 @@ public class Maze {
                 //AUMENTAMOS EL CONTADOR SI LA ULTIMA ES LA ENTRADA
                 if (isStartCoordinate(last)) {
                     times++;
-                    clearPath(path); //borramos el camino
+                    clearPath(path); //BORRAMOS EL CAMINO
                 } if (times == chances+1) {
-                    continue; //Asi no ejecuto el resto del codigo y puedo contar con la coordenada del paso actual
+                    continue; //ROMPEMOS BUCLE
                 }
-                //SI TIENE LIBRE POR LA DERECHA GIRA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO)
+                //SI HA ENCONTRADO LA SALIDA SE DESACTIVA LA CREACIÓN DE MUROS
                 if (isEndCoordinate(last)) {
                     makewalls = false;
                 }
+                //SI TIENE LIBRE POR LA DERECHA GIRA HACIA LA DERECHA Y CONTINUA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO). LO BLOQUEAN LOS MUROS ORIGINALES
                 if (!(isWall(last.rightJ(), last.rightI()))) {
                     Coordinate.rotate();
                     last.storedDirection = last.direction();
@@ -259,51 +260,62 @@ public class Maze {
                     Coordinate.rotatePi();
                     last.storedDirection = last.direction();
                 }
+                //POR DEFECTO SIEMPRE VAMOS A CREAR UN PASO
                 boolean create = true;
                 //CON ESTO BORRAMOS LOS "PASOS" SI HEMOS VUELTO SOBRE NUESTOS PASOS
-                if (path.size() >= 2) {
+                if (path.size() >= 2) { //MINIMO DOS PASOS PARA QUE NO HAYA UN FALLO DE RANGO
+                    //GUARDAMOS LA ANTERIOR COORDENADA A LA ACUTAL
                     Coordinate penultimate = path.get(path.size()-2);
+                    //SI LA SIGUIENTE ES IGUAL A LA ANTERIOR (ESTAMOS VOLVIENDO POR NUESTROS PASOS)
                     if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) {
-                        if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
-                            if (makewalls) {
+                        if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) { //NO MODIFICAMOS SI SON ENTRADA O SALIDA
+                            if (makewalls) { //CREAMOS MUROS
                                 map[last.i][last.j] = Config.RED_WAY_WALL;
-                            } else {
+                            } else { //DAMOS VÍA LIBRE SI LA CREACION DE MUROS ESTA DESACTIVADA (HEMOS ENCONTRADO LA SALIDA) 
                                 map[last.i][last.j] = ' ';
                             }
                         } 
-                        path.pop();
-                        create = false;
+                        path.pop(); //ELIMINAMOS ULTIMO PASO
+                        create = false; //NO CREAMOS UN NUEVO PASO PORQUE ESTAMOS RETROCEDIENDO
                     }
                 }
-                //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO. SIEMPRE TENDREMOS LIBRE PORQUE NOS ASEGURAMOS CON LOS METODOS ANTERIORES
+                //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO.
                 if (create) {
                     path.push(new Coordinate(last.nextJ(), last.nextI()));
                     if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
-                        map[last.i][last.j] = last.storedDirection;
-                        makewalls = true;
+                        map[last.i][last.j] = last.storedDirection; //MARCAMOS DIRECCIÓN EN EL MAPA
+                        makewalls = true; //VOLVEMOS A CREAR MUROS
                     }  
                 }
+                //TIEMPOS DE ESPERA
                 try {
-                    Thread.sleep(Config.RED_WAY_SPEED); // 5000 milisegundos = 5 segundos
+                    Thread.sleep(Config.RED_WAY_SPEED);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //MOSTRAMOS MAPA
                 System.out.println(showMap());
             }
-            redWalls = true; //EL MAPA SE HA MODIFICADO
+            redWalls = true; //EL MAPA SE HA MODIFICADO POR EL CAMINO ROJO
+            //MOSTRAMOS EL MAPA CON EL CAMINO ROJO
             System.out.println(showMap());
+            //MOSTRAMOS RUTA DEL CAMINO ROJO
             System.out.println(pathString(path));
         }
     }
+    //ES EL RECORRIDO DEFINITIVO QUE ENCUENTRA LA SALIDA
     private Stack<Coordinate> yellowWay() {
-        System.out.println("CAMINO AMARILLO");
+        //AQUI SE ALMACENA EL RECORRIDO
         Stack<Coordinate> path = new Stack<>();
+        //SI EL CAMINO SE QUEDA ATRAPADO EN SI MISMO NO NOS SIRVE POR LO QUE LO BORRAMOS DEL MAPA
         boolean clear = false;
         if (coordinates && redWalls) { //SI SE HAN ESTABLECIDO COORDENADAS Y SE HAN PUESTO MUROS
+            //METEMOS AL CAMINO LA COORDENADA DE ENTRADA
             path.push(new Coordinate(jStart, iStart));
+            //CONTADOR DE VECES QUE ROTA
             int times = 0;
-            
-            while (true && times < 4) {
+            //MIENTRAS NO HAYA ROTADO MAS DE CUATRO VECES (SIGNIFICA QUE SE HA QUEDADO ATRAPADO POR BLOQUEOS DE CUALQUIER TIPO)
+            while (times < 4) {
                 Coordinate last = path.peek();
                 if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
                     last.storedDirection = last.direction();
@@ -312,89 +324,113 @@ public class Maze {
                 if (isEndCoordinate(last)) {
                     break;
                 }
-                //SI TIENE LIBRE POR LA DERECHA GIRA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO)
+                //SI TIENE LIBRE POR LA DERECHA GIRA, SINO SIGUE DE FRENTE (SI ESTA LIBRE, SINO GIRA EN SENTIDO ANTIHORARIO). LO BLOQUEAN LOS MUROS ORIGINALES, LOS MUROS DEL CAMINO ROJO, SUS PROPIOS MUROS QUE EL DEJA CUANDO VUELVE POR SUS PASOS, SU PROPIO CAMINO, Y LOS MUROS DE DESCARTE
                 if (!(isWall(last.rightJ(), last.rightI()) || isRedWall(last.j, last.i) || isYellowWay(last.rightJ(), last.rightI()) || isYellowWall(last.rightJ(), last.rightI()) || isBlockChanceWall(last.rightJ(), last.rightI()))) {
-                    Coordinate.rotate();
-                    last.storedDirection = last.direction();
+                    Coordinate.rotate(); //ROTAMOS
+                    last.storedDirection = last.direction(); //ACTUALIZAMOS LA DIRECCION DE LA COORDENADA ACUTAL
                 }
-                
+                //RESTABLECEMOS EL CONTADOR DE GIROS
                 times = 0;
                 while ((isWall(last.nextJ(), last.nextI()) || isRedWall(last.nextJ(), last.nextI()) || isYellowWay(last.nextJ(), last.nextI()) || isYellowWall(last.nextJ(), last.nextI()) || isBlockChanceWall(last.nextJ(), last.nextI())) && times < 4) {
-                    if (path.size() >=2) {
+                    if (path.size() >=2) { //PARA QUE NO HAYA UN ERROR DE RANGO
                         Coordinate penultimate = path.get(path.size()-2);
-                        if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) {
+                        if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) { //SI LA SIGUIENTE ES LA PENÚLTIMA SALIMOS DEL BUCLE 
                             break;
                         }
                             
                     }
+                    //SI ROTAMOS AUMENTAMOS CONTADOR Y ACTUALIA
                     Coordinate.rotatePi();
                     times++;
                     last.storedDirection = last.direction();
                 }
+                //SI SE HA QUEDADO ATRAPADO ATIVAMOS QUE SE BORRE EL CAMINO AL FINAL
                 if (times >= 4) {
                     clear = true;
                 }
                 //CON ESTO BORRAMOS LOS "PASOS" SI HEMOS VUELTO SOBRE NUESTOS PASOS
                 boolean create = true; //SI BORRAMOS NO HACE FALTA CREAR UN PASO MÁS
                 if (path.size() >= 2) {
+                    //PENULTIMA COORDENADA
                     Coordinate penultimate = path.get(path.size()-2);
-                    if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) {
-                        
+                    if (last.nextI() == penultimate.i && last.nextJ() == penultimate.j) { //SI ES IGUAL AL SIGUIENTE SIGNIFICA QUE ESTAMOS VOLVIENDO SOBRE NUESTROS PASOS
+                        //AL VOLVER SOBRE NUESTOS PASOS DEJAMOS MUROS DEL CAMINO AMARILLO EXCEPTO SI ES LA ENTRADA O LA SALIDA
                         if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
-                            map[last.i][last.j] = Config.YELLOW_WAY_WALL;
+                            map[last.i][last.j] = Config.YELLOW_WAY_WALL; 
                         }
-                        
+                        //ELIMINAMOS EL ÚLTIMO
                         path.pop();
+                        //NO HACE FALTA CREAR
                         create = false;
                     }
                 }
-                //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO. SIEMPRE TENDREMOS LIBRE PORQUE NOS ASEGURAMOS CON LOS METODOS ANTERIORES
+                //CREAMOS UN "PASO" SI NO ESTAMODS VOLVIENDO.
                 if (create) {
+                    //CREAMOS COORDENADA
                     path.push(new Coordinate(last.nextJ(), last.nextI()));
+                    //SI NO ES LA ENTRADA NI LA SALIDA MOSTRAMOS LA DIRECCIÓN EN EL MAPA
                     if (!(isStartCoordinate(last)) && !(isEndCoordinate(last))) {
                         map[last.i][last.j] = last.storedDirection;
                     }  
                 }
+                //TIEMPO DE ESPERA
                 try {
                     Thread.sleep(Config.YELLOW_WAY_SPEED); // 5000 milisegundos = 5 segundos
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                //MOSTRAMOS PROCESO
                 System.out.println(showMap());
             }
         }
+        //MOSTRAMOS RESULTADO
         System.out.println(showMap());
+        //BORRAMOS CAMINO SI SE HA QUEDADO ENCERRADO
         if (clear) {
             path.clear();
         }
+        //AÑADIMOS EL CAMINO A UNA LISTA DE CAMINOS POSIBLES
         additionalPaths.add(path);
+        //DEVOLVEMOS CAMINO
         return path;
     }
-    
+    //ENCUENTRA EL PRIMER CAMINO QUE PUEDE
     public void firstPath() {
-        redWay();
-        String traceroute = pathString(yellowWay());
-        clearYellowWayWalls();
-        System.out.println(showMap());
-        System.out.println(traceroute);
+        redWay(); //CREAMOS MUROS ROJOS
+        String traceroute = pathString(yellowWay()); //GUARDAMOS RECORRIDO
+        clearYellowWayWalls(); //LIMPIAMOS MUROS
+        System.out.println(showMap()); //MOSTRAMOS MAPA
+        System.out.println(traceroute); //MOSTRAMOS EL CAMINO GUARDADO
     }
+    //INTENTA ENCONTRAR EL CAMINO MÁS CORTO
     public void shortestPath() {
-        if (redWalls) {
-            clearYellowWayWalls();
+        if (redWalls) { //SI SE HAN PUESTO MUROS ROJOS
+            clearYellowWayWalls(); //LIMPIAMOS MUROS AMARILLOS
+            //RECORREMOS EL ARRAY DE LOS CAMINOS POSIBLES. AL INICIO SOLO TENDRÁ EL DEL PRIMER CAMINO POSIBLE
             for (int i = 0; i < additionalPaths.size(); i++) {
+                //GUARDAMOS EL CAMINO
                 Stack<Coordinate> auxPath = additionalPaths.get(i);
+                //RECORREMOS EL CAMINO DEL FINAL HACIA EL INICIO
                 for (int j = auxPath.size()-1; j >= 0; j--) {
+                    //GUARDAMOS LA COORDENADA ACUTAL
                     Coordinate aux = auxPath.get(j);
+                    //SI TIENE UNA ALTERNATIVA BLOQUEA EL SIGUIENTE. OSEA EL ANTERIOR DESDE LA CASILLA DE ENTRADA HASTA LA CASILLA DE SALIDA. Y VUELVE A LANZAR EL CAMINO AMARILLO QUE ESTA VEZ TENDRA QUE ENCONTRAR OTRO CAMINO PORQUE HEMOS BLOQUEADO LA COORDENADA POR LA QUE PASABA HASTA LA SALIDA EN EL CAMINO ANTERIOR
                     if (chances(aux) > 0 && !(isEndCoordinate(aux) && isStartCoordinate(aux))) {                   
+                        //BLOQUEAMOS COORDENADA
                         Coordinate auxToWall = auxPath.get(j-1);
                         map[auxToWall.i][auxToWall.j] = Config.BLOCK_CHANCE_WALL;
+                        //LIMPIAMOS CAMINO
                         clearYellowWay();
+                        //LO VOLVEMOS A LANZAR CON LA COORDENADA BLOQUEADA
                         yellowWay();
+                        //LIMPIAMOS LOS MUROS QUE HA DEJADO
                         clearYellowWayWalls();
+                        //VOLVEMOS A HACEMOS EL MISMO PROCESO CON EL SIGUIENTE CAMINO (OSEA EL NUEVO QUE HA ENCONTRADO DESPUES DE BLOQUEAR LA CASILLA DEL ANTERIOR)
                         break;
                     }
                 }
             }
+            //EL METODO ANTERIOR DEJA ALGUNOS CAMINOS SIN COORDENADAS. ASI QUE LOS LIMPIAMOS
             ArrayList<Stack<Coordinate>> filteredPaths = new ArrayList<>();
             for (Stack<Coordinate> path : additionalPaths) {
                 if (!path.isEmpty()) {
@@ -402,36 +438,40 @@ public class Maze {
                 }
             }
             additionalPaths = filteredPaths;
+            //SI NO HAY NINGUN CAMINO EN LA LISTA DE CAMINOS POSIBLE SIGNIFICA QUE NO HA SIDO CAPAZ DE ENCONTRAR UNA SALIDA VÁLIDA (OSEA QUE LA SALIDA SE HA ESTABLECIDO EN UNA COORDENADA QUE EL CAMINO ROJO NO HA DESCARTADO). ESTO OCURRE POR EL PROPIO ALGORITMO, YA QUE EL CAMINO ROJO PODRIA VOLVER A LA SALIDA DESDE UN PUNTO DIFERENTE DEL QUE SALIÓ Y VOLVER A SALIR DESDE EL PUNTO QUE SALIÓ ANTERIORMENTE. (NO OCURRE SI EL BLOQUE HA SU DERECHA SE ENCUENTRA PEGADO A LAS PAREDES DEL LABERINTO)
             if (additionalPaths.isEmpty()) {
                 System.out.println("LA SALIDA NO HA SIDO DESCARTADA POR EL CAMINO ROJO. SE DEBE A UN PROBLEMA EN EL ALGORITMO");
             } else {
+                //OBTENEMOS EL CAMINO MÁS CORTO QUE HEMOS ENCONTRADO
                 Stack<Coordinate> shortestPath = additionalPaths.get(0); 
                 for (int i = 1; i < additionalPaths.size(); i++) {
                     if (additionalPaths.get(i).size() < shortestPath.size()) {
                         shortestPath = additionalPaths.get(i);
                     }
                 }
+                //GUARDAMOS RECORRIDO
                 String traceroute = pathString(shortestPath);
+                //VOLVEMOS A LEER EL MAPA PARA QUE QUEDE LIBRE DE ALTERACIONES
                 setEntranceExit(jStart, iStart, jEnd, iEnd);
-                
+                //ESCRIBIMOS LAS DIRECCIONES DEL CAMINO EN EL MAPA
                 for (Coordinate coordinate : shortestPath) {
                     if (!(isStartCoordinate(coordinate) || isEndCoordinate(coordinate))) {
                         map[coordinate.i][coordinate.j] = coordinate.storedDirection;
                     }
                 }
+                //MOSTRAMOS MAPA
                 System.out.println(Config.hr + "CAMINO MÁS CORTO\n" + Config.hr);
-                
-                
                 System.out.println(showMap());
                 System.out.println(traceroute);
             }
         }
     }
+    //NOS RESTABLECE EL MAPA CON LAS ENTRADAS Y SALIDAS PARA VOLVER A BUSCAR CAMINOS
     public void newSearh() {
         setEntranceExit(jStart, iStart, jEnd, iEnd);
         redWalls = false;
     }
-    
+    //BORRA LOS MUROS DEJADOS POR EL CAMINO AMARILLO
     private void clearYellowWayWalls() {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
@@ -441,6 +481,7 @@ public class Maze {
             }
         }
     }
+    //BORRA LAS DIRECCIONES DEJADAS POR EL CAMINO AMARILLO
     private void clearYellowWay() {
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < map[0].length; j++) {
@@ -450,7 +491,7 @@ public class Maze {
             }
         }
     }
-    
+    //BORRA LAS DIRECCIONES DEJADAS POR UN CAMINO PROPORCIONADO
     private void clearPath(Stack<Coordinate> path) {
         for (Coordinate coordinate : path) {
             if (!(coordinate.i == iStart && coordinate.j == jStart) && !(coordinate.i == iEnd && coordinate.j == jEnd)) {
@@ -458,6 +499,7 @@ public class Maze {
             }
         }
     }
+    //STRING QUE DA LAS COORDENADAS DE UN CAMINO EN FORMATO TEXTO
     private String pathString(Stack<Coordinate> path) {
         StringBuilder s = new StringBuilder();
         for (Coordinate coordinate : path) {
@@ -465,5 +507,4 @@ public class Maze {
         }
         return s.toString();
     }
-
 }

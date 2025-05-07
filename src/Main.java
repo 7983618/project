@@ -74,7 +74,7 @@ public class Main {
                 System.out.println(Config.hr + maze.showMap()); //MUESTRA EL MAPA DEL LABERINTO SI ESTA CARGADO, SINO MUESTRA MENSAJE DE QUE FALTA CARGAR
             } else if (option == 3) { //PIDE COORDENADAS DE ENTRADA Y SALIDA DEL LABERINTO CARGADO
                 setCoordinates();
-            } else if (option == 4) { //OPCION 4 SIN DESARROLLAR
+            } else if (option == 4) { //MUESTRA MENU PARA BUSCAR CAMINOS SI SE HAN ESTABLECIDO COORDENADAS PREVIAMENTE
                 if (maze.isCoordinates()) {
                     searhPath();
                 } else {
@@ -189,16 +189,16 @@ public class Main {
         while (option != 0) {
             System.out.println(Config.SEARCH_PATH_MENU);
             option = scannerInt();
-            if (option == 1) {
+            if (option == 1) { //PRIMER CAMINO POSIBLE
                 maze.firstPath();
-            } else if (option == 2) {
+            } else if (option == 2) { //CAMINO MÁS RAPIDO ENCONTRADO
                 if (maze.isRedWalls()) {
                     maze.shortestPath();
                 } else {
                     System.out.println(Config.hr);
                     System.out.println("No se ha hecho la primera ruta todavia");
                 }
-            } else if (option == 3) {
+            } else if (option == 3) { //RESETEO
                 maze.newSearh();
             }
         }

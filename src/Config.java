@@ -69,11 +69,15 @@ public class Config {
 													"Eleción...";
 	/** Separador de campos de usuario en el fichero de usuarios */
 	public static final String USER_REGEX = "#";
-
+	//MURO DEL CAMINO ROJO
 	public static final char RED_WAY_WALL = '.';
+	//MURO DEL CAMINO AMARILLO
 	public static final char YELLOW_WAY_WALL = 'x';
+	//MURO DE DESCARTE
 	public static final char BLOCK_CHANCE_WALL = 'N';
+	//VELOCIDAD DEL CAMINO ROJO
 	public static final int RED_WAY_SPEED = 50;
+	//VELOIDAD DEL CAMINO AMARILLO
 	public static final int YELLOW_WAY_SPEED = 50;
 
 	/** @return Ruta de los archivos */
